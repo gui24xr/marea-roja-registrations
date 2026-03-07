@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Stroke {
+  FREESTYLE
+  BUTTERFLY
+  BACKSTROKE
+  BREASTSTROKE
+  MEDLEY
+}
+
+enum UserType {
+  ADMIN
+  SWIMMER
+  GUARDIAN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model User {
+  id       String     @id @default(uuid())
+  clerkId  String     @unique
+  type     UserType
+  status   UserStatus @default(ACTIVE)
+  swimmers Swimmer[]  @relation("SwimmerUsers")
+}
+
+model Tournament {
+  id      String    @id @default(uuid())
+  label   String
+  rounds  Round[]
+}
+
+model Round {
+  id           String   @id @default(uuid())
+  tournamentId String
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+  events       Event[]
+}
+
+model Event {
+  id               String         @id @default(uuid())
+  roundId          String
+  round            Round          @relation(fields: [roundId], references: [id])
+  label            String
+  stroke           Stroke
+  registrationOpen Boolean        @default(true)
+  registrations    Registration[]
+}
+
+model Swimmer {
+  id            String         @id @default(uuid())
+  dni           String         @unique
+  firstName     String
+  lastName      String
+  registrations Registration[]
+  users         User[]         @relation("SwimmerUsers")
+}
+
+model Registration {
+  id        String   @id @default(uuid())
+  eventId   String
+  swimmerId String
+  event     Event    @relation(fields: [eventId], references: [id])
+  swimmer   Swimmer  @relation(fields: [swimmerId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([swimmerId, eventId])
+}
