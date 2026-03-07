@@ -27,7 +27,7 @@ export default function TournamentRegistrationForm({evento}:{evento:any}) {
   if (Object.keys(errs).length) { setErrors(errs); return; }
   setErrors({});
   setStatus("loading");
-  await newInscription(formData, pruebas);
+  await newInscription(formData);
   setStatus("ok");
 }
 
