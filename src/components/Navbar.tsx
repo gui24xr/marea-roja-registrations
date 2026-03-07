@@ -44,7 +44,8 @@ export default function Navbar() {
 
         {/* Right side */}
         <div className="flex items-center gap-4">
-          <UserButton />
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          <UserButton {...{ afterSignOutUrl: "/" } as any} />
 
           {/* Burger button */}
           <button
