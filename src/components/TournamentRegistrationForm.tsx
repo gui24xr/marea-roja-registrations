@@ -435,7 +435,7 @@ function validate(formData: FormData) {
                                 <span className="insc-pruebas-error">{errors.pruebas}</span>
                             )}
                             <div className="insc-check-grid">
-                                {evento.pruebas.map((prueba) => {
+                                {evento.pruebas.map((prueba:any) => {
                                     const checked = pruebas.includes(prueba.id);
                                     return (
                                         <label
