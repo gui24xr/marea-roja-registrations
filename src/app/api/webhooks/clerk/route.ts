@@ -35,7 +35,7 @@ export async function POST(req: Request) {
     return new Response('Webhook inválido', { status: 400 })
   }
 
-  console.log(`Evento recibido: ${evt.type}`, evt.data)
+  console.log(`Evento recibido desde clerk: ${evt.type}`, evt.data)
 
   return new Response('OK', { status: 200 })
 }
