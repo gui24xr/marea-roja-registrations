@@ -20,7 +20,7 @@ export async function createAndInviteUser(data: { personId: string, email: strin
             },
         })
 
-        await prisma.user.create({
+        const newUser = await prisma.user.create({
             data: {
                 clerkInvitationData: JSON.parse(JSON.stringify(invitation)),
                 email: data.email,
@@ -32,9 +32,20 @@ export async function createAndInviteUser(data: { personId: string, email: strin
             }
         })
 
+        return {
+            success: true,
+            payload: {
+                invitationUrl: 'asasasasasaasa',
+                user: newUser
+            }
+        }
+
     } catch (error) {
         //error de clerk? borro el registro creado
         //error al guasdar en BD? revoco en clerk
         console.log(error)
+        return {
+            success: false,
+        }
     }
 }
