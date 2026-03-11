@@ -32,6 +32,9 @@ export async function createAndInviteUser(data: { personId: string, email: strin
             }
         })
 
+        console.log('Invitation:', invitation)
+        console.log('newUser:' ,newUser)
+
         return {
             success: true,
             payload: {
