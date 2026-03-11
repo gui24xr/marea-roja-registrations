@@ -2,7 +2,7 @@ import { PrismaClient, Stroke } from "../src/generated/prisma";
 
 const prisma = new PrismaClient();
 
-const swimmers = [
+const persons = [
   { dni: "20345678", firstName: "Lucas",     lastName: "Fernández" },
   { dni: "24123456", firstName: "Martina",   lastName: "Gómez" },
   { dni: "27654321", firstName: "Sebastián", lastName: "López" },
@@ -45,16 +45,44 @@ const tournamentData = {
   ],
 };
 
+const personsWithoutProfile = [
+  { dni: "40123456", firstName: "Bruno",     lastName: "Acosta" },
+  { dni: "41234567", firstName: "Catalina",  lastName: "Benítez" },
+  { dni: "42345678", firstName: "Emilio",    lastName: "Cabrera" },
+  { dni: "43456789", firstName: "Daniela",   lastName: "Esquivel" },
+  { dni: "44567890", firstName: "Federico",  lastName: "Figueroa" },
+  { dni: "45678901", firstName: "Gabriela",  lastName: "Godoy" },
+  { dni: "46789012", firstName: "Hernán",    lastName: "Ibáñez" },
+  { dni: "47890123", firstName: "Irene",     lastName: "Juárez" },
+  { dni: "48901234", firstName: "Joaquín",   lastName: "Leal" },
+  { dni: "49012345", firstName: "Karina",    lastName: "Medina" },
+  { dni: "50123456", firstName: "Leonardo",  lastName: "Navarro" },
+  { dni: "51234567", firstName: "Miriam",    lastName: "Ojeda" },
+];
+
 async function main() {
-  console.log("Seeding swimmers...");
-  for (const swimmer of swimmers) {
-    await prisma.swimmer.upsert({
-      where: { dni: swimmer.dni },
+  console.log("Seeding persons with swimmer profiles...");
+  for (const person of persons) {
+    await prisma.person.upsert({
+      where: { dni: person.dni },
       update: {},
-      create: swimmer,
+      create: {
+        ...person,
+        swimmer: { create: {} },
+      },
     });
   }
-  console.log(`${swimmers.length} swimmers inserted.`);
+  console.log(`${persons.length} persons (with swimmer profiles) inserted.`);
+
+  console.log("Seeding persons without swimmer profile (miembros)...");
+  for (const person of personsWithoutProfile) {
+    await prisma.person.upsert({
+      where: { dni: person.dni },
+      update: {},
+      create: { ...person },
+    });
+  }
+  console.log(`${personsWithoutProfile.length} persons (without swimmer profile) inserted.`);
 
   console.log("Seeding tournament, rounds and events...");
   const tournament = await prisma.tournament.create({

@@ -19,31 +19,61 @@ enum Stroke {
 
 enum UserType {
   ADMIN
-  SWIMMER
-  GUARDIAN
+  USER
 }
 
 enum UserStatus {
+  INVITED
   ACTIVE
   INACTIVE
 }
 
+model Person {
+  id           String          @id @default(uuid())
+  dni          String          @unique
+  firstName    String
+  lastName     String
+  user         User?
+  swimmer      SwimmerProfile?
+  canAccess    PersonAccess[]  @relation("Accessor")
+  accessibleBy PersonAccess[]  @relation("Subject")
+}
+
 model User {
   id       String     @id @default(uuid())
-  clerkId  String     @unique
-  type     UserType
+  clerkId  String?     @unique
+  clerkInvitationData Json?
+  email String @unique
+  type     UserType   @default(USER)
   status   UserStatus @default(ACTIVE)
-  swimmers Swimmer[]  @relation("SwimmerUsers")
+  person   Person     @relation(fields: [personId], references: [id])
+  personId String     @unique
+}
+
+model SwimmerProfile {
+  id            String         @id @default(uuid())
+  person        Person         @relation(fields: [personId], references: [id])
+  personId      String         @unique
+  registrations Registration[]
+}
+
+model PersonAccess {
+  accessorId String
+  subjectId  String
+  accessor   Person @relation("Accessor", fields: [accessorId], references: [id])
+  subject    Person @relation("Subject", fields: [subjectId], references: [id])
+
+  @@id([accessorId, subjectId])
 }
 
 model Tournament {
-  id      String    @id @default(uuid())
-  label   String
-  rounds  Round[]
+  id     String  @id @default(uuid())
+  label  String
+  rounds Round[]
 }
 
 model Round {
-  id           String   @id @default(uuid())
+  id           String     @id @default(uuid())
   tournamentId String
   tournament   Tournament @relation(fields: [tournamentId], references: [id])
   events       Event[]
@@ -59,22 +89,13 @@ model Event {
   registrations    Registration[]
 }
 
-model Swimmer {
-  id            String         @id @default(uuid())
-  dni           String         @unique
-  firstName     String
-  lastName      String
-  registrations Registration[]
-  users         User[]         @relation("SwimmerUsers")
-}
-
 model Registration {
-  id        String   @id @default(uuid())
+  id        String         @id @default(uuid())
   eventId   String
   swimmerId String
-  event     Event    @relation(fields: [eventId], references: [id])
-  swimmer   Swimmer  @relation(fields: [swimmerId], references: [id])
-  createdAt DateTime @default(now())
+  event     Event          @relation(fields: [eventId], references: [id])
+  swimmer   SwimmerProfile @relation(fields: [swimmerId], references: [id])
+  createdAt DateTime       @default(now())
 
   @@unique([swimmerId, eventId])
 }

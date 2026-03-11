@@ -16,20 +16,18 @@ import {
 } from "@/components/ui/table"
 import { MoreHorizontalIcon } from "lucide-react"
 import { prisma, Prisma } from "@/lib/prisma"
+import { NewUserForm } from "@/components/NewUserForm"
 
 export default async function page() {
 
-   const swimmersList = await prisma.swimmerProfile.findMany({
-  include: {
-    person: {
-      include: {
-        user: true
-      }
-    }
-  }
-})
+    const personsList = await prisma.person.findMany({
+        include: {
+            swimmer: true,
+            user: true
+        }
+    })
 
-    console.log('Lista nadadores: ', swimmersList)
+    console.log('Lista de miembros del natatorio: ', personsList)
 
 
     return (
@@ -39,17 +37,19 @@ export default async function page() {
                     <TableHead>DNI</TableHead>
                     <TableHead>APELLIDO</TableHead>
                     <TableHead>NOMBRE</TableHead>
+                    <TableHead>es Nadador</TableHead>
                     <TableHead>Usuario</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {swimmersList.map((swimmer) => (
-                    <TableRow key={swimmer.person.dni}>
-                        <TableCell className="font-medium">{swimmer.person.dni}</TableCell>
-                        <TableCell>{swimmer.person.lastName}</TableCell>
-                        <TableCell>{swimmer.person.firstName}</TableCell>
-                        <TableCell>{swimmer.person?.user?.status || 'Enviar Invitacion'}</TableCell>
+                {personsList.map((person) => (
+                    <TableRow key={person.dni}>
+                        <TableCell className="font-medium">{person.dni}</TableCell>
+                        <TableCell>{person.lastName}</TableCell>
+                        <TableCell>{person.firstName}</TableCell>
+                        <TableCell>{person.swimmer ? 'Si' : 'No'}</TableCell>
+                        <TableCell>{person.user?.status || <NewUserForm person={person}/>}</TableCell>
                         <TableCell className="text-right">
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
